@@ -1,0 +1,181 @@
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<!--[if lt IE 9]>
+	<div class="ie-upgrade-container">
+		<p class="ie-upgrade-message">Please, upgrade Internet Explorer to continue using this software.</p>
+		<a class="ie-upgrade-link" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer.aspx">Upgrade</a>
+	</div>
+	<![endif]-->
+	<!--[if gte IE 9 | !IE ]> <!-->
+	<!--script src="app.js"></script-->
+	<![endif]-->
+<script type="text/javascript">
+var toolkit,itemTable,inputDict;
+
+function removeChildren(parent){
+	while (parent.firstChild) {
+		parent.removeChild(parent.firstChild);
+	}
+}
+
+function createOption(datalist, value) {
+  var option = document.createElement('OPTION');
+  option.value = value;
+  datalist.insertBefore(option, datalist.firstChild);
+}
+
+function createOptions(datalist, list) {
+	removeChildren(datalist);
+  for (var iii=0;iii<list.length;iii++) {
+  		createOption(datalist,list[iii]);
+  }
+}
+
+function createCombobox(parentNode, alias, list) {
+    var tr = document.createElement('tr');
+    tr.className = "cmdRow";
+    parentNode.appendChild(tr);
+
+    var tdBtn = document.createElement('td');
+    tr.appendChild(tdBtn);
+    var btn = document.createElement('input');
+    tdBtn.appendChild(btn);
+    btn.type = 'button';
+    btn.value = alias;
+    btn.className = "btnAlias";
+
+    var tdInput = document.createElement('td');
+    tr.appendChild(tdInput);
+    var input = document.createElement('input');
+    tdInput.appendChild(input);
+    input.className = "inputParams";
+    input.type = "text";
+    try {
+        input.value = list.slice(-1)[0];   
+    }catch(_e){
+    		input.value = "";
+    }
+    input.setAttribute("list", alias);
+
+    var datalist = document.createElement('DATALIST');
+    tdInput.appendChild(datalist);
+    datalist.id = alias;  
+    
+    createOptions(datalist,list);
+
+    var tdFile = document.createElement('td');
+    tr.appendChild(tdFile);
+    var btnFile = document.createElement('input');
+    tdFile.appendChild(btnFile);
+    btnFile.type = 'button';
+    btnFile.value = 'F';
+    btnFile.className = "btnClean";
+
+    var tdDir = document.createElement('td');
+    tr.appendChild(tdDir);
+    var btnDir = document.createElement('input');
+    tdDir.appendChild(btnDir);
+    btnDir.type = 'button';
+    btnDir.value = 'D';
+    btnDir.className = "btnClean";
+
+    var tdDel = document.createElement('td');
+    tr.appendChild(tdDel);
+    var btnDel = document.createElement('input');
+    tdDel.appendChild(btnDel);
+    btnDel.type = 'button';
+    btnDel.value = '-';
+    btnDel.disabled = true;
+    btnDel.style.color = 'transparent';
+    btnDel.className = "btnDel";
+
+    var tdClean = document.createElement('td');
+    tr.appendChild(tdClean);
+    var btnClean = document.createElement('input');
+    tdClean.appendChild(btnClean);
+    btnClean.type = 'button';
+    btnClean.value = 'C';
+    btnClean.className = "btnClean";
+
+    btn.onclick = function(){
+        external.invoke(JSON.stringify({'alias':alias,'params':input.value}))
+        var index=list.indexOf(input.value);
+        if (index > -1){
+        	list.splice(index,1);
+        }
+        list.push(input.value);
+        createOptions(datalist,list);
+    }
+    input.addEventListener('contextmenu', function(ev) {
+        ev.preventDefault();
+        input.value = "";
+        return false;
+    }, false);
+    btnDel.onclick = function(){
+        external.invoke("DEL:"+alias)
+    }
+    btnClean.onclick = function(){
+        external.invoke("CLEAN:"+alias)
+    }
+    inputDict[alias]=input;
+    btnDir.onclick = function(){
+        external.invoke("ADD:_DIR:"+alias)
+    }
+    btnFile.onclick = function(){
+        external.invoke("ADD:FILE:"+alias)
+    }
+}
+
+function showShortcuts() {
+	removeChildren(itemTable);
+	var keys = Object.keys(toolkit);
+	keys.sort();
+	inputDict={};
+	for (var iii=0;iii<keys.length;iii++) {
+		var alias = keys[iii];
+		createCombobox(itemTable, alias, toolkit[alias]['optList']);
+	}
+}
+
+window.onload = function() {
+	itemTable = document.getElementById("itemTable");
+	external.invoke('INIT');
+}
+
+function enableDelBtns() {
+	var eleList = document.getElementsByClassName("btnDel");
+    for (var iii=0;iii<eleList.length;iii++) {
+        var element = eleList[iii];
+        if (element.disabled) {
+            element.disabled = false;
+            element.style.color = '';
+        } else {
+            element.disabled = true;
+            element.style.color = 'transparent';
+        }
+    }
+}
+</script>
+		<button onclick="external.invoke('INIT')">INIT</button>
+		<button onclick="enableDelBtns()">-</button>
+		<button onclick="window.location.href='/settings.html'">+</button>
+		<button class="tip" onclick="external.invoke('HOME')">Help
+			<span>
+				Toolkit on windows. qinhuawei@outlook.com
+				"-": remove shortcut from table.<br>
+				"+": enter add shortcut page.<br>
+				"F": File select dialog.<br>
+				"D": Directory select dialog.<br>
+				"C": clean history.<br>
+				"RightClick in input-field": clean input.
+			</span>
+		</button>
+		<table id="itemTable">
+		</table>
+	</body>
+</html>

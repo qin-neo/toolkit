@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body>
+<script>
+var alias,mainCmd,mainFolder;
+window.onload = function() {
+	alias = document.getElementById("alias");
+	mainCmd = document.getElementById("mainCmd");
+	mainFolder = document.getElementById("mainFolder");
+}
+function addShortcut() {
+	external.invoke(JSON.stringify({'alias':alias.value,'mainCmd':mainCmd.value,'mainFolder':mainFolder.value,}))
+	window.location.href='/index.html';
+}
+</script>
+<table>
+	<tr>
+		<td>Alias</td>
+		<td><input style='width:500px' type="text" id="alias"></td>
+	</tr>
+	<tr>
+		<td>Main Cmd</td>
+		<td><input style='width:500px' type="text" id="mainCmd"></td>
+		<td><button onclick="external.invoke('SET:FILE')">F</button></td>
+	</tr>
+	<tr>
+		<td>Main Dir</td>
+		<td><input style='width:500px' type="text" id="mainFolder"></td>
+		<td><button onclick="external.invoke('SET:_DIR')">D</button></td>
+	</tr>
+</table>
+<button onclick="window.location.href='/index.html'">Cancel</button>
+<button onclick="addShortcut()">OK</button>
+	</body>
+</html>

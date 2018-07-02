@@ -1,0 +1,11 @@
+set PATH=%PATH%;D:\Tools\gcc-6-win64\bin
+set PATH=%PATH%;D:\Tools\PortableGit\bin
+git clone https://github.com/qin-neo/toolkit.git
+cd toolkit
+set GOPATH=%CD%
+
+go get github.com/zserge/webview
+go get -u github.com/jteeuwen/go-bindata/...
+
+bin\go-bindata -pkg main -o assets.go -prefix assets/ assets/
+go build -ldflags "-H=windowsgui"
