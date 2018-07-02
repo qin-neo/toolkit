@@ -122,7 +122,7 @@ func handleRPC(w webview.WebView, data string) {
 		updateMainPage(w)
 	case "HOME":
 		go func() {
-			exec.Command("explorer", `C:\Users\ehuawqi\Desktop\go_webview`).Run()
+			exec.Command("explorer", `https://github.com/qin-neo/toolkit`).Run()
 		}()
 	case "DEL:": //DEL:alias
 		delete(gInfoMap, data[4:])
